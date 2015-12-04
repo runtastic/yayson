@@ -10,7 +10,6 @@ describe 'Store', ->
     @store.records = []
     @store.relations = {}
 
-
   it 'should sync an event', ->
     event = @store.sync data:
       type: 'events'
@@ -109,6 +108,35 @@ describe 'Store', ->
     expect(event.name).to.equal 'Demo'
     expect(event.images[0].name).to.equal 'Header'
     expect(event.images[0].event.id).to.equal 1
+
+  it 'should create models without get function', ->
+    @store = new Store({ addGet: false });
+    @store.sync
+      data:
+        type: 'events'
+        id: 1
+        attributes:
+          name: 'Demo'
+        relationships:
+          image:
+            data: {
+              type: 'images'
+              id: 2
+            }
+            links:
+              next: 'url-to-next',
+              prev: 'url-to-prev'
+      included: [{
+        type: 'images'
+        id: 2
+        attributes:
+          name: 'Header'
+          links: 'Links attribute'
+      }]
+
+    event = @store.find 'events', 1
+    expect(event.get).to.be.undefined
+    expect(event.image.get).to.be.undefined
 
   it 'should handle relations with links', ->
     @store.sync

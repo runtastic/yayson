@@ -7,6 +7,7 @@ module.exports = (utils) ->
 
   class Store
     constructor: (options) ->
+      @options = options || { addGet: true }
       @reset()
 
     reset: ->
@@ -39,9 +40,11 @@ module.exports = (utils) ->
 
           if currentModel?
               linksAttr = currentModel.links
+              currentModel.links = links
 
-              if currentModel.links?
-                  currentModel.links = links
+              if @options.addGet
+                  currentModel.get = (attrName) ->
+                      if attrName == 'links' then linksAttr else currentModel[attrName]
       model
 
     findRecord: (type, id) ->
