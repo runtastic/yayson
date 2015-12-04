@@ -5337,6 +5337,9 @@ module.exports = function(utils) {
   })();
   return Store = (function() {
     function Store(options) {
+      this.options = options || {
+        addGet: true
+      };
       this.reset();
     }
 
@@ -5373,8 +5376,15 @@ module.exports = function(utils) {
           currentModel = model[key];
           if (currentModel != null) {
             linksAttr = currentModel.links;
-            if (currentModel.links != null) {
-              currentModel.links = links;
+            currentModel.links = links;
+            if (this.options.addGet) {
+              currentModel.get = function(attrName) {
+                if (attrName === 'links') {
+                  return linksAttr;
+                } else {
+                  return currentModel[attrName];
+                }
+              };
             }
           }
         }
