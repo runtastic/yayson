@@ -30,4 +30,7 @@ node_modules
 test/.tmp
 
 # Compiled
-lib
+#lib
+
+#Editors
+*.swp

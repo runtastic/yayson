@@ -5349,6 +5349,7 @@ module.exports = function(utils) {
       var base, currentModel, data, key, links, linksAttr, model, name, ref, rel, resolve;
       model = utils.clone(rec.attributes) || {};
       model.id = rec.id;
+      model.type = rec.type;
       models[type] || (models[type] = {});
       (base = models[type])[name = rec.id] || (base[name] = model);
       if (rec.relationships != null) {
@@ -5372,14 +5373,9 @@ module.exports = function(utils) {
           currentModel = model[key];
           if (currentModel != null) {
             linksAttr = currentModel.links;
-            currentModel.get = function(attrName) {
-              if (attrName === 'links') {
-                return linksAttr;
-              } else {
-                return currentModel[attrName];
-              }
-            };
-            currentModel.links = links || {};
+            if (currentModel.links != null) {
+              currentModel.links = links;
+            }
           }
         }
       }

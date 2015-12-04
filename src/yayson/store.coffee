@@ -16,6 +16,7 @@ module.exports = (utils) ->
     toModel: (rec, type, models) ->
       model = utils.clone(rec.attributes) || {}
       model.id = rec.id
+      model.type = rec.type
       models[type] ||= {}
       models[type][rec.id] ||= model
       if rec.relationships?
@@ -39,12 +40,8 @@ module.exports = (utils) ->
           if currentModel?
               linksAttr = currentModel.links
 
-              # Getter allows accessing a model attribute called 'links',
-              # which would otherwise be overwritten by resource links.
-              currentModel.get = (attrName) ->
-                  if attrName == 'links' then linksAttr else currentModel[attrName]
-
-              currentModel.links = links || {}
+              if currentModel.links?
+                  currentModel.links = links
       model
 
     findRecord: (type, id) ->
