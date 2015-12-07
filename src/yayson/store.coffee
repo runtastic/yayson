@@ -40,7 +40,9 @@ module.exports = (utils) ->
 
           if currentModel?
               linksAttr = currentModel.links
-              currentModel.links = links
+
+              if links
+                  currentModel.links = links
 
               if @options.addGet
                   currentModel.get = (attrName) ->
