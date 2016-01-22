@@ -1,13 +1,16 @@
-
 module.exports = (utils) ->
-
   class Record
     constructor: (options) ->
-      {@id, @type, @attributes, @relationships} = options
+      {@links, @meta, @id, @type, @attributes, @relationships} = options
 
   class Store
     constructor: (options) ->
-      @options = options || { addGet: true }
+      @options = utils.clone(options) || {}
+
+      @options.addLinks ?= false
+      @options.addMeta ?= false
+      @options.throwWarning ?= false
+
       @reset()
 
     reset: ->
@@ -20,10 +23,41 @@ module.exports = (utils) ->
       model.type = rec.type
       models[type] ||= {}
       models[type][rec.id] ||= model
+
+      addMeta = (mkey, mval) =>
+        if @options.addMeta and mval?
+          model.meta ?= {}
+          if model.meta[mkey] and @options.throwWarning
+            throw new Error('Meta-key ' + mkey + ' already defined by root record!')
+          model.meta[mkey] = mval
+
+      addLinks = (lkey, lval) =>
+        if @options.addLinks and lval?
+          model.links ?= {}
+          if model.links[lkey] and @options.throwWarning
+            throw new Error('Link-key ' + lkey + ' already defined by root record!')
+          model.links[lkey] = lval
+
+      if rec.meta?
+        for mkey, mval of rec.meta
+          addMeta mkey, mval
+
+      if rec.links?
+        for lkey, lval of rec.links
+          addLinks lkey, lval
+
       if rec.relationships?
         for key, rel of rec.relationships
           data = rel.data
           links = rel.links
+          meta = rel.meta
+
+          if @options.addMeta and meta?
+            addMeta key, meta
+
+          if @options.addLinks and links?
+            addLinks key, links
+
           model[key] = null
           continue unless data? or links?
           resolve = ({type, id}) =>
@@ -35,18 +69,6 @@ module.exports = (utils) ->
           else
             {}
 
-          # Model of the relation
-          currentModel = model[key]
-
-          if currentModel?
-              linksAttr = currentModel.links
-
-              if links
-                  currentModel.links = links
-
-              if @options.addGet
-                  currentModel.get = (attrName) ->
-                      if attrName == 'links' then linksAttr else currentModel[attrName]
       model
 
     findRecord: (type, id) ->
@@ -98,6 +120,7 @@ module.exports = (utils) ->
           add data
 
       sync body.included
+
       recs = sync body.data
 
       return null unless recs?
@@ -109,7 +132,9 @@ module.exports = (utils) ->
       else
         @toModel recs, recs.type, models
 
+    syncWithMeta: (body) =>
+      data = @sync body
+      meta = body.meta || {}
 
-
-
+      return { data, meta }
 

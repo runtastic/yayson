@@ -3,7 +3,6 @@ expect = require('chai').expect
 Store = require('../../src/yayson.coffee')().Store
 
 describe 'Store', ->
-
   beforeEach ->
     @store = new Store()
 
@@ -109,36 +108,9 @@ describe 'Store', ->
     expect(event.images[0].name).to.equal 'Header'
     expect(event.images[0].event.id).to.equal 1
 
-  it 'should create models without get function', ->
-    @store = new Store({ addGet: false });
-    @store.sync
-      data:
-        type: 'events'
-        id: 1
-        attributes:
-          name: 'Demo'
-        relationships:
-          image:
-            data: {
-              type: 'images'
-              id: 2
-            }
-            links:
-              next: 'url-to-next',
-              prev: 'url-to-prev'
-      included: [{
-        type: 'images'
-        id: 2
-        attributes:
-          name: 'Header'
-          links: 'Links attribute'
-      }]
-
-    event = @store.find 'events', 1
-    expect(event.get).to.be.undefined
-    expect(event.image.get).to.be.undefined
-
   it 'should handle relations with links', ->
+    @store = new Store({ addLinks: true})
+
     @store.sync
       data:
         type: 'events'
@@ -164,12 +136,12 @@ describe 'Store', ->
 
     event = @store.find 'events', 1
     expect(event.image.name).to.equal 'Header'
-    expect(event.image.get('name')).to.equal 'Header'
-    expect(event.image.links).to.deep.equal {
-      next: 'url-to-next'
-      prev: 'url-to-prev'
-    }
-    expect(event.image.get('links')).to.equal 'Links attribute'
+    expect(event.links).to.deep.equal({
+      image: {
+        next: 'url-to-next',
+        prev: 'url-to-prev'
+      }
+    })
 
   it 'should return a event with all associated objects', ->
     @store.sync
@@ -324,4 +296,35 @@ describe 'Store', ->
     event = @store.find 'events', 1
     expect(event.name).to.equal 'Demo'
     expect(event.images.links).to.deep.equal
-        self: 'http://example.com/events/1/relationships/images'
+
+  it 'should include meta attributes in denormalized objects', ->
+    @store = new Store({ addGet: false, addMeta: true })
+
+    @store.sync
+      data: [{
+        type: 'events'
+        id: 1
+        attributes:
+          name: 'Demo'
+        relationships:
+          images:
+            links:
+              self: 'http://example.com/events/1/relationships/images'
+            meta:
+              count: 20
+          bookings:
+            meta:
+              max_attendees: 20
+        meta:
+          awesome: 'yes'
+      }]
+
+     event = @store.find 'events', 1
+
+     expect(event.meta).to.deep.equal({
+       awesome: 'yes',
+       images:
+         count: 20
+       bookings:
+         max_attendees: 20
+     })
