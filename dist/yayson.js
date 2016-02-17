@@ -5420,7 +5420,7 @@ module.exports = function(utils) {
             addLinks(key, links);
           }
           model[key] = null;
-          if (!((data != null) || (links != null))) {
+          if (data == null) {
             continue;
           }
           resolve = (function(_this) {
