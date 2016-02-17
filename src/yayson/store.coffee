@@ -59,7 +59,8 @@ module.exports = (utils) ->
             addLinks key, links
 
           model[key] = null
-          continue unless data? or links?
+
+          continue unless data?
           resolve = ({type, id}) =>
             @find type, id, models
           model[key] = if data instanceof Array

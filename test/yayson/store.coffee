@@ -281,7 +281,9 @@ describe 'Store', ->
     expect(images).to.deep.eq []
 
 
-  it 'should handle circular relations', ->
+  it 'should handle relationships with empty data attribute by setting attr to null', ->
+    @store = new Store({ addLinks: true})
+
     @store.sync
       data:
         type: 'events'
@@ -295,7 +297,10 @@ describe 'Store', ->
 
     event = @store.find 'events', 1
     expect(event.name).to.equal 'Demo'
-    expect(event.images.links).to.deep.equal
+
+    expect(event.links).to.deep.equal({
+      images: { self: 'http://example.com/events/1/relationships/images' }
+    })
 
   it 'should include meta attributes in denormalized objects', ->
     @store = new Store({ addGet: false, addMeta: true })
