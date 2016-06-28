@@ -10,6 +10,7 @@ module.exports = (utils) ->
       @options.addLinks ?= false
       @options.addMeta ?= false
       @options.throwWarning ?= false
+      @options.keepEmptyRelationships ?= false
 
       @reset()
 
@@ -107,7 +108,8 @@ module.exports = (utils) ->
 
     sync: (body) ->
       sync = (data) =>
-        return null unless data?
+        if data?
+          if @options.keepEmptyRelationships then return { id } else return null
         add = (obj) =>
           {type, id} = obj
           @remove type, id

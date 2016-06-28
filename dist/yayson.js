@@ -5340,7 +5340,7 @@ module.exports = function(utils) {
   return Store = (function() {
     function Store(options) {
       this.syncWithMeta = bind(this.syncWithMeta, this);
-      var base, base1, base2;
+      var base, base1, base2, base3;
       this.options = utils.clone(options) || {};
       if ((base = this.options).addLinks == null) {
         base.addLinks = false;
@@ -5350,6 +5350,9 @@ module.exports = function(utils) {
       }
       if ((base2 = this.options).throwWarning == null) {
         base2.throwWarning = false;
+      }
+      if ((base3 = this.options).keepEmptyRelationships == null) {
+        base3.keepEmptyRelationships = false;
       }
       this.reset();
     }
@@ -5503,8 +5506,14 @@ module.exports = function(utils) {
       sync = (function(_this) {
         return function(data) {
           var add;
-          if (data == null) {
-            return null;
+          if (data != null) {
+            if (_this.options.keepEmptyRelationships) {
+              return {
+                id: id
+              };
+            } else {
+              return null;
+            }
           }
           add = function(obj) {
             var id, rec, type;

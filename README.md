@@ -24,9 +24,10 @@ Feel free to use, but use with cause.
 ```javascript
 
 const store = new Store({
-    addLinks: true,  //If true, will add nested links attribute to resolved models (default: false)
-    addMeta: true,  //If true, will add nested meta atttribute to resolved models (default: false)
-    throwWarning: false //If true, will throw on error if a meta / links attribute name collision happens
+    addLinks: true,  // If true, will add nested links attribute to resolved models (default: false)
+    addMeta: true,  // If true, will add nested meta atttribute to resolved models (default: false)
+    throwWarning: false, // If true, will throw on error if a meta / links attribute name collision happens
+    keepEmptyRelationships: false, // If true, relationships which are not included will not be stripped away and result in a simple object with one id attribute
 });
 
 
