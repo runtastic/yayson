@@ -5457,7 +5457,7 @@ module.exports = function(utils) {
         models = {};
       }
       rec = this.findRecord(type, id);
-      if (rec != null) {
+      if (rec == null) {
         if (this.options.keepEmptyRelationships) {
           return {
             id: id

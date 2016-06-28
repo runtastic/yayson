@@ -83,7 +83,7 @@ module.exports = (utils) ->
 
     find: (type, id, models = {}) ->
       rec = @findRecord(type, id)
-      if rec?
+      unless rec?
         if @options.keepEmptyRelationships then return { id } else return null
       models[type] ||= {}
       models[type][id] || @toModel(rec, type, models)
