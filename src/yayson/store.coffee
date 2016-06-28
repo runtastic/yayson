@@ -83,7 +83,8 @@ module.exports = (utils) ->
 
     find: (type, id, models = {}) ->
       rec = @findRecord(type, id)
-      return null unless rec?
+      if rec?
+        if @options.keepEmptyRelationships then return { id } else return null
       models[type] ||= {}
       models[type][id] || @toModel(rec, type, models)
 
@@ -108,8 +109,7 @@ module.exports = (utils) ->
 
     sync: (body) ->
       sync = (data) =>
-        if data?
-          if @options.keepEmptyRelationships then return { id } else return null
+        return null unless data?
         add = (obj) =>
           {type, id} = obj
           @remove type, id

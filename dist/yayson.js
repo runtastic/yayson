@@ -5457,8 +5457,14 @@ module.exports = function(utils) {
         models = {};
       }
       rec = this.findRecord(type, id);
-      if (rec == null) {
-        return null;
+      if (rec != null) {
+        if (this.options.keepEmptyRelationships) {
+          return {
+            id: id
+          };
+        } else {
+          return null;
+        }
       }
       models[type] || (models[type] = {});
       return models[type][id] || this.toModel(rec, type, models);
@@ -5506,14 +5512,8 @@ module.exports = function(utils) {
       sync = (function(_this) {
         return function(data) {
           var add;
-          if (data != null) {
-            if (_this.options.keepEmptyRelationships) {
-              return {
-                id: id
-              };
-            } else {
-              return null;
-            }
+          if (data == null) {
+            return null;
           }
           add = function(obj) {
             var id, rec, type;
