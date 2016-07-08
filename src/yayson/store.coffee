@@ -138,6 +138,14 @@ module.exports = (utils) ->
     syncWithMeta: (body) =>
       data = @sync body
       meta = body.meta || {}
+      links = body.links || {}
 
-      return { data, meta }
+      return { data, meta, links }
+
+    syncWithMetaAndLinks: (body) =>
+      data = @sync body
+      meta = body.meta || {}
+      links = body.links || {}
+
+      return { data, meta, links }
 
